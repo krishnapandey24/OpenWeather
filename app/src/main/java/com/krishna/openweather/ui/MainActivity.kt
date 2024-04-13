@@ -1,4 +1,4 @@
-package com.krishna.openweather
+package com.krishna.openweather.ui
 
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
