@@ -12,7 +12,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
-import androidx.navigation.ui.AppBarConfiguration
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -20,7 +19,6 @@ import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.krishna.openweather.Appt
-import com.krishna.openweather.R
 import com.krishna.openweather.databinding.ActivityMainBinding
 import com.krishna.openweather.models.WeatherResponse
 import com.krishna.openweather.viewModels.HomeViewModel
@@ -54,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setData(weatherResponse: WeatherResponse){
+
 
     }
 
