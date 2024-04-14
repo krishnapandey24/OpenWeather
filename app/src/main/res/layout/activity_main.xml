@@ -59,10 +59,9 @@
             app:layout_constraintTop_toBottomOf="@+id/mainWeather" />
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_marginEnd="16dp"
+            android:id="@+id/mainIcon"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             app:layout_constraintBottom_toBottomOf="@+id/mainWeatherDescription"
             app:layout_constraintEnd_toStartOf="@+id/mainWeather"
             app:layout_constraintTop_toTopOf="@+id/mainWeather"
@@ -80,7 +79,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.48"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+            app:layout_constraintTop_toBottomOf="@+id/mainIcon" />
 
         <TextView
             android:id="@+id/feelsLike"
@@ -137,7 +136,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="UV index: "
+                android:text="Precetipation:"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/textView6"
@@ -148,10 +147,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Dew point: "
+                android:text="Clouds:"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="@+id/textView11"
+                app:layout_constraintEnd_toStartOf="@+id/dewPointView"
                 app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
             <TextView
@@ -161,7 +160,7 @@
                 android:text="Visibility: "
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="@+id/textView10"
+                app:layout_constraintEnd_toStartOf="@+id/visibilityView"
                 app:layout_constraintTop_toTopOf="@+id/pressureView" />
 
             <TextView
@@ -198,14 +197,14 @@
                 app:layout_constraintTop_toTopOf="@+id/textView6" />
 
             <TextView
-                android:id="@+id/uvIndexView"
+                android:id="@+id/precipitationView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2.7m/s"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/textView12"
-                app:layout_constraintStart_toEndOf="@+id/textView6"
+                app:layout_constraintStart_toEndOf="@+id/textView12"
                 app:layout_constraintTop_toTopOf="@+id/textView12" />
 
             <TextView

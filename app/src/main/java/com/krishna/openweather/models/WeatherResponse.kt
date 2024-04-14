@@ -13,7 +13,31 @@ data class WeatherResponse(
 
 data class Forecast(
     val dt: Long,
-    val main: Main
+    val main: Main,
+    val weather: List<Weather>,
+    val clouds: Clouds,
+    val wind: Wind,
+    val visibility: Int,
+    val pop: Double
+
+)
+
+data class Wind(
+    val speed: Double,
+    val deg: Int,
+    val gust: Double
+
+)
+
+class Clouds(
+    val all: Int
+)
+
+data class Weather(
+    val id: Int,
+    val main: String,
+    val description: String,
+    val icon: String
 )
 
 data class Main(
