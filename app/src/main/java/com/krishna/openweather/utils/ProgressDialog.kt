@@ -10,3 +10,10 @@ class ProgressDialog(context: Context) : Dialog(context) {
         setCancelable(false)
     }
 }
+
+class NetworkErrorDialog(context: Context): Dialog(context){
+    init {
+        setContentView(R.layout.network_error_dialog)
+        setCancelable(true)
+    }
+}

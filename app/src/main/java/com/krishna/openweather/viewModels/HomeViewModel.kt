@@ -15,19 +15,17 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val repository: HomeRepository) : ViewModel() {
     val weatherResponse = MutableLiveData<WeatherResponse>()
-    val success = MutableLiveData<Boolean>()
+    val success = MutableLiveData<Int>()
 
     fun getWeather(latitude: Double, longitude: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response: WeatherResponse = repository.getWeatherByCoOrdinates(latitude, longitude)
-                success.postValue(true)
-                log("response.city ${response.list.size}")
                 weatherResponse.postValue(response)
+                success.postValue(1)
             } catch (e: Exception) {
-                success.postValue(false)
+                success.postValue(0)
                 e.printStackTrace()
-                log("e ${e.message}")
             }
         }
     }

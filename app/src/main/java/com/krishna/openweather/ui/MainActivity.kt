@@ -30,6 +30,8 @@ import com.krishna.openweather.models.Forecast
 import com.krishna.openweather.models.WeatherResponse
 import com.krishna.openweather.utils.Constants.celsius
 import com.krishna.openweather.utils.Constants.iconUrl
+import com.krishna.openweather.utils.NetworkErrorDialog
+import com.krishna.openweather.utils.ProgressDialog
 import com.krishna.openweather.viewModels.HomeViewModel
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -49,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     private var longitude: Double = 0.0
     private lateinit var userAddress: String
     private lateinit var binding: ActivityMainBinding
+    private lateinit var progressDialog: ProgressDialog
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,9 +59,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        progressDialog = ProgressDialog(this)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         getLocation()
+
+//        progressDialog.show()
 
 
     }
@@ -86,50 +92,25 @@ class MainActivity : AppCompatActivity() {
         homeViewModel.weatherResponse.observe(this) {
             setData(it)
         }
+        homeViewModel.success.observe(this){
+            progressDialog.dismiss()
+            if(it!=1){
+                NetworkErrorDialog(this).show()
+            }
+
+        }
     }
 
 
     private fun getLocation() {
-        var permissionGranted = true
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            val locationPermissionRequest = registerForActivityResult(
-                ActivityResultContracts.RequestMultiplePermissions()
-            ) { permissions ->
-                permissionGranted = when {
-                    permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                        true
-                    }
-
-                    permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-
-                        true
-                    }
-
-                    else -> {
-                        Appt.show(this, "Location permission not granted")
-                        false
-                    }
-                }
-            }
-
-
-
-            locationPermissionRequest.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
-
+        var permissionGranted= true
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            permissionGranted = requestLocationPermission()
         }
 
+        if(!permissionGranted) return
+
+        progressDialog.show()
 
         fusedLocationClient.getCurrentLocation(
             Priority.PRIORITY_HIGH_ACCURACY,
@@ -153,6 +134,38 @@ class MainActivity : AppCompatActivity() {
             }
 
 
+    }
+
+
+    private fun requestLocationPermission(): Boolean {
+        var permissionGranted= false
+        val locationPermissionRequest =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                if (!(permissions.getOrDefault(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        false
+                    )) && !(permissions.getOrDefault(
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        false
+                    ))
+                ) {
+                    Appt.show(this, "Location permission not granted")
+
+                }else{
+                    permissionGranted= true
+                }
+            }
+
+
+
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+
+        return permissionGranted
     }
 
 
