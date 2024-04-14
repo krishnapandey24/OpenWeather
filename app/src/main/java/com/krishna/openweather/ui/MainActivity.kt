@@ -7,7 +7,6 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -30,14 +29,13 @@ import com.krishna.openweather.models.Forecast
 import com.krishna.openweather.models.WeatherResponse
 import com.krishna.openweather.utils.Constants.celsius
 import com.krishna.openweather.utils.Constants.iconUrl
+import com.krishna.openweather.utils.LocationPermissionNotGrantedDialog
 import com.krishna.openweather.utils.NetworkErrorDialog
 import com.krishna.openweather.utils.ProgressDialog
 import com.krishna.openweather.viewModels.HomeViewModel
-import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
-import java.lang.Math.round
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -52,6 +50,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userAddress: String
     private lateinit var binding: ActivityMainBinding
     private lateinit var progressDialog: ProgressDialog
+    private lateinit var networkErrorDialog: NetworkErrorDialog
+    private lateinit var locationPermissionNotGrantedDialog: LocationPermissionNotGrantedDialog
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,11 +60,25 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         progressDialog = ProgressDialog(this)
+        networkErrorDialog = NetworkErrorDialog(this) {
+            fetchWeather()
+        }
+
+
+        locationPermissionNotGrantedDialog = LocationPermissionNotGrantedDialog(this) {
+            getLocation()
+        }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         getLocation()
 
-//        progressDialog.show()
+        homeViewModel.success.observe(this) {
+            progressDialog.dismiss()
+            if (it != 1) {
+                networkErrorDialog.show()
+            }
+
+        }
 
 
     }
@@ -92,23 +106,24 @@ class MainActivity : AppCompatActivity() {
         homeViewModel.weatherResponse.observe(this) {
             setData(it)
         }
-        homeViewModel.success.observe(this){
-            progressDialog.dismiss()
-            if(it!=1){
-                NetworkErrorDialog(this).show()
-            }
 
-        }
     }
 
 
     private fun getLocation() {
-        var permissionGranted= true
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+        var permissionGranted = true
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             permissionGranted = requestLocationPermission()
         }
 
-        if(!permissionGranted) return
+        if (!permissionGranted) return
 
         progressDialog.show()
 
@@ -121,11 +136,13 @@ class MainActivity : AppCompatActivity() {
                 override fun isCancellationRequested() = false
             })
             .addOnSuccessListener { location: Location? ->
-                if (location == null)
+                if (location == null) {
+                    locationPermissionNotGrantedDialog.show()
                     Toast.makeText(this, "Cannot get location.", Toast.LENGTH_SHORT).show()
-                else {
+                } else {
                     latitude = location.latitude
                     longitude = location.longitude
+                    Appt.log("$latitude $longitude")
 //                    getAddressFromLocation()
                     fetchWeather()
 
@@ -138,7 +155,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun requestLocationPermission(): Boolean {
-        var permissionGranted= false
+        var permissionGranted = false
         val locationPermissionRequest =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
                 if (!(permissions.getOrDefault(
@@ -149,10 +166,11 @@ class MainActivity : AppCompatActivity() {
                         false
                     ))
                 ) {
-                    Appt.show(this, "Location permission not granted")
+                    locationPermissionNotGrantedDialog.show()
 
-                }else{
-                    permissionGranted= true
+
+                } else {
+                    permissionGranted = true
                 }
             }
 
