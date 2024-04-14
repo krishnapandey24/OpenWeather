@@ -199,8 +199,8 @@ class MainActivity : AppCompatActivity() {
         binding.windView.text = "${current.wind.speed} m/s"
         binding.humidityView.text = current.main.humidity.toString()
         binding.pressureView.text = current.main.pressure.toString()
-        binding.visibilityView.text = current.visibility.toString()
-        binding.precipitationView.text = "${current.pop * 10}%}"
+        binding.visibilityView.text = "${current.visibility/100}km"
+        binding.precipitationView.text = "${current.pop * 10}%"
         binding.dewPointView.text = current.clouds.all.toString()
 
         setTimeAndWeather(weatherResponse.list.take(9))
