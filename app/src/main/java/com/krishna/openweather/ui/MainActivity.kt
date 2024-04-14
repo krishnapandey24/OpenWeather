@@ -111,7 +111,8 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun getLocation() {
-        var permissionGranted = true
+        progressDialog.show()
+
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -120,13 +121,8 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            permissionGranted = requestLocationPermission()
+            requestLocationPermission()
         }
-
-        if (!permissionGranted) return
-
-        progressDialog.show()
-
         fusedLocationClient.getCurrentLocation(
             Priority.PRIORITY_HIGH_ACCURACY,
             object : CancellationToken() {
@@ -154,10 +150,11 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
+
     private fun requestLocationPermission(): Boolean {
-        var permissionGranted = false
-        val locationPermissionRequest =
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        var permissionGranted = true
+        val locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
                 if (!(permissions.getOrDefault(
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         false
@@ -167,10 +164,12 @@ class MainActivity : AppCompatActivity() {
                     ))
                 ) {
                     locationPermissionNotGrantedDialog.show()
-
+                    permissionGranted=false
 
                 } else {
                     permissionGranted = true
+                    Appt.show(this, "permission granted")
+                    getLocation()
                 }
             }
 
