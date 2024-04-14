@@ -1,8 +1,15 @@
 package com.krishna.openweather.network
 
-import retrofit2.http.POST
+import com.krishna.openweather.models.WeatherResponse
+import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface WeatherAPI {
+
+    @GET("forecast")
+    suspend fun getWeatherForecast(@Query("lat") latitude: Double, @Query("lon") longitude: Double): WeatherResponse
+
+
 
 
 }

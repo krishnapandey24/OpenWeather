@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -19,12 +20,31 @@ object NetworkModule {
     @Provides
     @Singleton
     fun weatherAPI(): WeatherAPI {
-        val url = "https://api.openweathermap.org/data/2.5/"
+        val key= com.krishna.openweather.BuildConfig.API_KEY
+
         val gson: Gson = GsonBuilder().setLenient().create()
 
         val weatherAPI: WeatherAPI by lazy {
+            val httpClient = OkHttpClient.Builder()
+                .addInterceptor { chain ->
+                    val original = chain.request()
+                    val originalHttpUrl = original.url()
+
+                    val url = originalHttpUrl.newBuilder()
+                        .addQueryParameter("appid", key)
+                        .build()
+
+                    val requestBuilder = original.newBuilder()
+                        .url(url)
+
+                    val request = requestBuilder.build()
+                    chain.proceed(request)
+                }
+                .build()
+
             val retrofit = Retrofit.Builder()
-                .baseUrl(url)
+                .baseUrl("https://api.openweathermap.org/data/2.5/")
+                .client(httpClient)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
 

@@ -1,37 +1,31 @@
 package com.krishna.openweather.viewModels
 
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.krishna.myapplication.network.Service
-import com.krishna.myapplication.network.ServiceResponse
+import com.krishna.openweather.models.WeatherResponse
+import com.krishna.openweather.repositories.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
-    val services = MutableLiveData<List<Service>>()
+class HomeViewModel @Inject constructor(private val repository: HomeRepository) : ViewModel() {
+    val weatherResponse = MutableLiveData<WeatherResponse>()
     val success = MutableLiveData<Boolean>()
 
-
-    fun getServices() {
+    fun getWeather(latitude: Double, longitude: Double) {
         viewModelScope.launch(Dispatchers.IO) {
-            try{
-                val serviceResponse: ServiceResponse = repository.getServices()
-                if (serviceResponse.success == "success") {
-                    services.postValue(serviceResponse.services)
-                    success.postValue(true)
-                } else {
-                    throw Exception()
-                }
-            }catch(e: Exception){
+            try {
+                val response: WeatherResponse = repository.getWeatherByCoOrdinates(latitude, longitude)
+                success.postValue(true)
+                weatherResponse.postValue(response)
+            } catch (e: Exception) {
                 success.postValue(false)
                 e.printStackTrace()
             }
-
         }
     }
 

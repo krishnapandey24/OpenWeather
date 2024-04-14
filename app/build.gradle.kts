@@ -8,16 +8,22 @@ plugins {
 }
 
 android {
-    namespace = "com.krishna.myapplication"
+    namespace = "com.krishna.openweather"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.krishna.myapplication"
+        applicationId = "com.krishna.openweather"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "API_KEY",
+            "\"${project.findProperty("API_KEY")}\""
+        )
     }
 
     buildTypes {
@@ -32,6 +38,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig  = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -43,6 +50,7 @@ android {
 }
 
 dependencies {
+    val navVersion = "2.7.7"
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -54,7 +62,11 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.5.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
 
+    // Kotlin
+    implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
+    implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
 
     implementation("com.google.dagger:hilt-android:2.48.1")
     kapt("com.google.dagger:hilt-android-compiler:2.48.1")
